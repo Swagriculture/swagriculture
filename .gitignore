@@ -1,0 +1,7 @@
+## files to ignore
+
+## third-party
+/node_modules
+
+## JetBrains
+/.idea
