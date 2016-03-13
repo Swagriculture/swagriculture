@@ -16,21 +16,34 @@ var Q = require('q');
 //    }
 //
 //});
-var _successOpeningText = "Search Results: "
+var _successOpeningText = "Search Results: ";
+var _helpText = "PLACEHOLDER HELP TEXT";
 
-function _sendSMSReply (queryResp, replyPhoneNumber, cb) {
+function _sendSearchResults (queryResp, replyPhoneNumber, cb){
+    _sendSMSReply(_successOpeningText.concat(queryResp), replyPhoneNumber, cb);
+}
+
+function _sendHelp (replyPhoneNumber, cb){
+    _sendSMSReply(_helpText, replyPhoneNumber, cb);
+}
+
+function _sendSMSReply (message, replyPhoneNumber, cb) {
     client.sendMessage({
         to: replyPhoneNumber,
         from: config.TWILIO.PHONE_NUMBER,
-        body: _successOpeningText.concat(queryResp)
+        body: message
     }, function(err, responseData){
         if(!err){
             console.log("message sent successfully!");
-            cb();
+            if (cb) {
+                cb();
+            }
         }
     })
 }
 
 module.exports = {
-    sendSMSReply: _sendSMSReply
+    sendSMSReply: _sendSMSReply,
+    sendSearchResults: _sendSearchResults,
+    sendHelp: _sendHelp
 };
