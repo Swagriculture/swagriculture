@@ -7,7 +7,21 @@ function _handleHelpRequest (req, res, next) {
         next();
     }
 }
-
+function _isFullQuery(string){
+    return string.indexOf('+') > 0;
+}
+function _parseQuery (string){
+    //query format: title, header (if there is a header)
+    var query = {};
+    var parsedQuery = string.split('+');
+    query.title = parsedQuery[0];
+    if(_isFullQuery(string)) {
+        query.header = parsedQuery[1];
+        query.isFull = true;
+    }
+    return query
+}
 module.exports = {
-    handleHelpRequest: _handleHelpRequest
+    handleHelpRequest: _handleHelpRequest,
+    parseQuery: _parseQuery
 };

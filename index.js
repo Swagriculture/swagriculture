@@ -48,9 +48,21 @@ app.post('/incoming', utils.handleHelpRequest, session.getSession, function(req,
 
     var replyPhoneNumber = req.body.From;
     var queryText = req.body.Body;
-    wikiHandler.getWikiData(queryText, function (queryResp) {
-        twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
-    });
+    var query = utils.parseQuery(queryText);
+    if (query.isFull){
+        console.log("calling full query handler with,", query);
+        wikiHandler.getFullData(query.title, query.header, function (queryResp) {
+            twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
+        })
+    } else {
+        console.log("calling get header handler with", query);
+        wikiHandler.getHeaders(query.title, function(headerList) {
+            twilioHandler.sendHeaders(headerList, replyPhoneNumber)
+        })
+    }
+    //wikiHandler.getWikiData(queryText, function (queryResp) {
+    //    twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
+    //});
 
 });
 
