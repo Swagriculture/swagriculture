@@ -4,6 +4,8 @@ var app = express();
 var wikiHandler = require("./wiki.js");
 var bodyParser = require('body-parser');
 var twilioHandler = require('./twilio.js');
+var session = require('./session.js');
+var utils = require('./utils.js');
 
 // client.sendMessage({
 // 	to: '',
@@ -19,8 +21,10 @@ var twilioHandler = require('./twilio.js');
 // 	}
 
 // });
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/', function(req, res){
     console.log('receiving get request');
     res.send('you only yolo once');
@@ -36,19 +40,16 @@ app.get('/', function(req, res){
 //    }, 0);
 //}
 
-//sends success to Twilio, dunno if they do anything with it though.
-function _sendSuccess (res) {
-    res.sendStatus(201);
-}
 
-app.post('/incoming', function(req, res) {
+app.post('/incoming', utils.handleHelpRequest, session.getSession, function(req, res) {
     console.log("processing incoming text");
     console.log("req.body: ", req.body);
+    console.log("req.session: ", req.session);
+
     var replyPhoneNumber = req.body.From;
     var queryText = req.body.Body;
-
     wikiHandler.getWikiData(queryText, function (queryResp) {
-        twilioHandler.sendSMSReply(queryResp, replyPhoneNumber, _sendSuccess.bind(null, res));
+        twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
     });
 
 });
