@@ -5,25 +5,19 @@ var wikiHandler = require("./wiki.js");
 var bodyParser = require('body-parser');
 var twilioHandler = require('./twilio.js');
 
-// client.sendMessage({
-// 	to: '',
-// 	from:'',
-// 	body:'yo you sexy mofo'
-	
-// }, function(err, responseData){
-// 	if(!err){
+// Run test on startup
+mockQuery = "cassava";
+console.log('Asking api for '+mockQuery);
 
-// 		console.log(responseData.from); // outputs "+14506667788"
-//         console.log(responseData.body); // outputs "word to your mother."
+wikiHandler.getWikiData(mockQuery, function (queryResp) {
+	// No point
+});
 
-// 	}
-
-// });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', function(req, res){
-    console.log('receiving get request');
-    res.send('you only yolo once');
+    console.log('Receiving get request');
+    res.send('I listen to lesbians licking while I lie longitudially late at night lamenting my lack of involvement');
 });
 
 // async mock of Ji's wikiQuerying function
@@ -47,8 +41,9 @@ app.post('/incoming', function(req, res) {
     var replyPhoneNumber = req.body.From;
     var queryText = req.body.Body;
 
-    wikiHandler.getWikiData(queryText, function (queryResp) {
+    wikiHandler.getWikiData(queryText, sessionQuery, function (queryResp, seesionLevel) {
         twilioHandler.sendSMSReply(queryResp, replyPhoneNumber, _sendSuccess.bind(null, res));
+        
     });
 
 });
