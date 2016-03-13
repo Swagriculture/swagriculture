@@ -3,13 +3,11 @@ var express = require("express");
 var app = express();
 var request = require("request");
 var client = require('twilio')(config.TWILIO.ACCOUNT_SID , config.TWILIO.AUTH_TOKEN);
-var request = require("request");
+var request = require("wiki.js");
 
-request("http://apaulling.com/swagriculture//api.php?format=json&action=query&titles=Main_Page&prop=revisions&rvprop=content&callback=?", 
-	function(error, response, body) {
-  console.log(error);
-  console.log(body);
-});
+
+
+
 // console.log("account SID ="+config.TWILIO.AUTH_TOKEN);
 
 // client.sendMessage({
