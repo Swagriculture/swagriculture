@@ -52,7 +52,7 @@ app.post('/incoming', utils.handleHelpRequest, session.getSession, function(req,
         });
     } else if (query.isTitleAndArgs) {
         console.log("calling get header handler with", query);
-        wikiHandler.getSections(query.title, query.args, session, function(textMessage) {
+        wikiHandler.getSections(query.title, query.args, function(textMessage) {
             twilioHandler.sendSMSReply(textMessage, replyPhoneNumber);
         });
     }

@@ -111,68 +111,46 @@ function getDescriptionAndToc(queryTitle, sendText){
     });
 }
 
-function getSections(queryTitle, queryArgs, session, sendText){
+function getSections(queryTitle, queryArgs, sendText){
     console.log(session.title);
     console.log(queryTitle);
-    if (session.title == queryTitle) {
-        console.log('Session active');
+    console.log('New Query, no session');
 
-        // Check if args exist in session table of content
-        queryArgs = parseQueryArgs(queryTitle, session.tableOfContents);
-        for (var arg in queryArgs) {
-            if (!arg){
-                // Index recieved not sent
-                textMsg += "Secion x not found\n";
-            }
-            else {
-                // Get that section
-                _getWikiSectionFromTitleIndex(queryTitle, arg, function(s){
-                    textMsg += s;
-                });
-            }
-        }
-        console.log(textMsg);
-    }
-    else {
+    // New query. Check if page exists.
+    _getWikiSectionFromTitleIndex(queryTitle, 0, function(description){
         console.log('New Query, no session');
+        if (description == "No Match"){
+            // TODO Search for queryTitle in page content
+        }
+        else {
+            // Get TOC            
+            _getWikiPageSectionTitles(queryTitle, function(sectionTitles){
 
-        // New query. Check if page exists.
-        _getWikiSectionFromTitleIndex(queryTitle, 0, function(description){
-            console.log('New Query, no session');
-            if (description == "No Match"){
-                // TODO Search for queryTitle in page content
-            }
-            else {
-                // Get TOC            
-                _getWikiPageSectionTitles(queryTitle, function(sectionTitles){
-
-                    queryArgs = parseQueryArgs(queryTitle, sectionTitles);
-                    for (var arg in queryArgs) {
-                        if (!arg){
-                            // Index recieved not sent
-                            textMsg += "Secion x not found\n";
-                        }
-                        else {
-                            // Get that section
-                            _getWikiSectionFromTitleIndex(queryTitle, arg, function(s){
-                                textMsg += s;
-                                if (callBackFinished(arg,queryArgs))
-                                    sendText(textMsg);
-                            });
-                        }
+                queryArgs = parseQueryArgs(queryTitle, sectionTitles);
+                for (var arg in queryArgs) {
+                    if (!arg){
+                        // Index recieved not sent
+                        textMsg += "Secion x not found\n";
                     }
-                    // Save stuff in session
-                    // TODO
+                    else {
+                        // Get that section
+                        _getWikiSectionFromTitleIndex(queryTitle, arg, function(s){
+                            textMsg += s;
+                            if (callBackFinished(arg,queryArgs))
+                                sendText(textMsg);
+                        });
+                    }
+                }
+                // Save stuff in session
+                // TODO
 
-                    // Respond with text
-                    sendText(description+"\nWhatchu wanna do?\n"+prettyTableOfContents+"Reply with..");
-                });
-
-            }
-        });
-
-    }
+                // Respond with text
+                sendText(description+"\nWhatchu wanna do?\n"+prettyTableOfContents+"Reply with..");
+            });
+        }
+    });    
 }
+
 var calls = 0;
 function callBackFinished(total){
     calls++;
