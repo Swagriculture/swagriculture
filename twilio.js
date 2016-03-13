@@ -16,7 +16,7 @@ var Q = require('q');
 //    }
 //
 //});
-var _successOpeningText = "Search Results: "
+var _successOpeningText = "Search Results: ";
 
 function _sendSMSReply (queryResp, replyPhoneNumber, cb) {
     client.sendMessage({
@@ -28,7 +28,7 @@ function _sendSMSReply (queryResp, replyPhoneNumber, cb) {
             console.log("message sent successfully!");
             cb();
         }
-    })
+    });
 }
 
 module.exports = {

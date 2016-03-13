@@ -6,10 +6,14 @@ var bodyParser = require('body-parser');
 var twilioHandler = require('./twilio.js');
 
 // Run test on startup
-mockQuery = "cassava";
+var mockQuery = "cassava";
 console.log('Asking api for '+mockQuery);
+var req = {};
+req.session = {};
+req.session.title = "cassava";
+req.session.tableOfContents = "";
 
-wikiHandler.getWikiData(mockQuery, function (queryResp) {
+wikiHandler.parseWikiQuery(mockQuery, req, function (queryResp) {
 	// No point
 });
 
