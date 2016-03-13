@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Swagriculture/swagriculture#readme",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "twilio": "^2.9.0"
   }
 }
