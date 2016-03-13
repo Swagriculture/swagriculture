@@ -1,7 +1,7 @@
 var config = require("./config.js");
 var express = require("express");
 var app = express();
-var request = require("wiki.js");
+var wikiHandler = require("./wiki.js");
 var bodyParser = require('body-parser');
 var twilioHandler = require('./twilio.js');
 
@@ -48,7 +48,7 @@ app.post('/incoming', function(req, res) {
     var queryText = req.body.Body;
 
     //TODO: change this to the actual wiki querier
-    _mockQuerier(queryText, function (queryResp) {
+    wikiHandler.getWikiData(queryText, function (queryResp) {
         twilioHandler.sendSMSReply(queryResp, replyPhoneNumber, _sendSuccess.bind(null, res));
     });
 
