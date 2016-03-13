@@ -20,10 +20,11 @@ function cleanWikiResponse(str) {
 
 var parseQueryArgs = function(argsString, tableOfContents){
     argsArray = argsString.split(",");
-
     var indexes = [];
     for (var arg in argsArray){
-        if (isInt(arg)){
+        arg = argsArray[arg].trim();
+        argInt = parseInt(arg);
+        if (!isNaN(argInt)){
             if (tableOfContents[arg] !== undefined)
                 indexes.push(arg);
             else
@@ -87,7 +88,7 @@ var _getWikiPageSectionTitles = function(getWikiData, cb){
 
 
 // Open Methods (called from index.js)
-function getDescriptionAndToc(queryTitle, sendText){
+function getDescriptionAndToc(queryTitle, sendTextCallBack){
 
     _getWikiSectionFromTitleIndex(queryTitle, 0, function(description){
         if (description == "No Match"){
@@ -98,35 +99,33 @@ function getDescriptionAndToc(queryTitle, sendText){
             _getWikiPageSectionTitles(queryTitle, function(sectionTitles){
                 var prettyTableOfContents = "";
                 for (var sectionIndex in sectionTitles){
-                    prettyTableOfContents += sectionIndex+". "+sectionTitles[sectionIndex]+"\n";
+                    prettyTableOfContents += (parseInt(sectionIndex)+1)+". "+sectionTitles[sectionIndex]+"\n";
                 }
                 // Save stuff in session
                 // TODO
 
                 // Respond with text
-                sendText(description+"\nWhatchu wanna do?\n"+prettyTableOfContents+"Reply with..");
+                sendTextCallBack(description+"\nFor more info on the items below:\n"+prettyTableOfContents+
+                    "\nReply with "+queryTitle+" + section number\nFor example: \""+queryTitle+" + 3\" for "+ sectionTitles[3]);
             });
 
         }
     });
 }
 
-function getSections(queryTitle, queryArgs, sendText){
-    console.log(session.title);
-    console.log(queryTitle);
-    console.log('New Query, no session');
-
+function getSections(queryTitle, queryArgs, sendTextCallBack){
+    
     // New query. Check if page exists.
     _getWikiSectionFromTitleIndex(queryTitle, 0, function(description){
-        console.log('New Query, no session');
         if (description == "No Match"){
             // TODO Search for queryTitle in page content
         }
         else {
             // Get TOC            
             _getWikiPageSectionTitles(queryTitle, function(sectionTitles){
-
-                queryArgs = parseQueryArgs(queryTitle, sectionTitles);
+                var textMsg = "";
+                queryArgs = parseQueryArgs(queryArgs, sectionTitles);
+                
                 for (var arg in queryArgs) {
                     if (!arg){
                         // Index recieved not sent
@@ -134,10 +133,11 @@ function getSections(queryTitle, queryArgs, sendText){
                     }
                     else {
                         // Get that section
-                        _getWikiSectionFromTitleIndex(queryTitle, arg, function(s){
-                            textMsg += s;
-                            if (callBackFinished(arg,queryArgs))
-                                sendText(textMsg);
+                        _getWikiSectionFromTitleIndex(queryTitle, queryArgs[arg], function(s){
+                            textMsg += s+"\n";
+                            if (callBackFinished(queryArgs.length))
+                                sendTextCallBack(textMsg);
+
                         });
                     }
                 }
@@ -145,7 +145,7 @@ function getSections(queryTitle, queryArgs, sendText){
                 // TODO
 
                 // Respond with text
-                sendText(description+"\nWhatchu wanna do?\n"+prettyTableOfContents+"Reply with..");
+                // sendTextCallBack(description+"\nWhatchu wanna do?\n"+prettyTableOfContents+"Reply with..");
             });
         }
     });    
@@ -153,8 +153,9 @@ function getSections(queryTitle, queryArgs, sendText){
 
 var calls = 0;
 function callBackFinished(total){
+    
     calls++;
-    console.log(calls);
+    console.log("calls"+calls+"total"+total+"(calls == total)"+(calls == total));
     return (calls == total);
 }
 

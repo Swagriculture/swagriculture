@@ -16,21 +16,24 @@ app.get('/', function(req, res){
 });
 
 // Run test on startup
-// var mockQuery = "cassava";
-// console.log('Asking api for '+mockQuery);
+var mockQuery = "cassava";
+console.log('Asking api for '+mockQuery);
+var req = {};
+req.session = {};
+req.session.title = "cassava";
+req.session.tableOfContents = "";
 
-// var session = {title: "cassavaa", tableOfContents: ""};
 // var query = utils.parseQuery(mockQuery);
 
 // if (query.isTitleOnly){
 //     console.log("calling full query handler with,", query);
 //     wikiHandler.getDescriptionAndToc(query.title, function (textMessage) {
-//         console.log("textMessage", textMessage);
+//         console.log("textMessage from index.j", textMessage);
 //     });
 // } else if (query.isTitleAndArgs) {
 //     console.log("calling get header handler with", query);
-//     wikiHandler.getSections(query.title, query.args, session, function(textMessage) {
-//         console.log("textMessage", textMessage);
+//     wikiHandler.getSections(query.title, query.args, function(textMessage) {
+//         console.log("textMessage from index.j", textMessage);
 //     });
 // }
 
