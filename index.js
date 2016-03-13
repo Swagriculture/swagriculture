@@ -27,14 +27,14 @@ app.get('/', function(req, res){
 });
 
 // async mock of Ji's wikiQuerying function
-function _mockQuerier (stringOfQueries, cb) {
-    console.log("calling mockQuerier");
-    console.log("stringofQueries: ");
-    var mockQueryResp = 'pretend this is a response for '+ stringOfQueries;
-    setTimeout(function(){
-        cb(mockQueryResp);
-    }, 0);
-}
+//function _mockQuerier (stringOfQueries, cb) {
+//    console.log("calling mockQuerier");
+//    console.log("stringofQueries: ");
+//    var mockQueryResp = 'pretend this is a response for '+ stringOfQueries;
+//    setTimeout(function(){
+//        cb(mockQueryResp);
+//    }, 0);
+//}
 
 //sends success to Twilio, dunno if they do anything with it though.
 function _sendSuccess (res) {
@@ -47,7 +47,6 @@ app.post('/incoming', function(req, res) {
     var replyPhoneNumber = req.body.From;
     var queryText = req.body.Body;
 
-    //TODO: change this to the actual wiki querier
     wikiHandler.getWikiData(queryText, function (queryResp) {
         twilioHandler.sendSMSReply(queryResp, replyPhoneNumber, _sendSuccess.bind(null, res));
     });
