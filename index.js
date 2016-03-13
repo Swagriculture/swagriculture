@@ -7,21 +7,6 @@ var twilioHandler = require('./twilio.js');
 var session = require('./session.js');
 var utils = require('./utils.js');
 
-// client.sendMessage({
-// 	to: '',
-// 	from:'',
-// 	body:'yo you sexy mofo'
-	
-// }, function(err, responseData){
-// 	if(!err){
-
-// 		console.log(responseData.from); // outputs "+14506667788"
-//         console.log(responseData.body); // outputs "word to your mother."
-
-// 	}
-
-// });
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -30,15 +15,25 @@ app.get('/', function(req, res){
     res.send('you only yolo once');
 });
 
-// async mock of Ji's wikiQuerying function
-//function _mockQuerier (stringOfQueries, cb) {
-//    console.log("calling mockQuerier");
-//    console.log("stringofQueries: ");
-//    var mockQueryResp = 'pretend this is a response for '+ stringOfQueries;
-//    setTimeout(function(){
-//        cb(mockQueryResp);
-//    }, 0);
-//}
+// Run test on startup
+// var mockQuery = "cassava";
+// console.log('Asking api for '+mockQuery);
+
+// var session = {title: "cassavaa", tableOfContents: ""};
+// var query = utils.parseQuery(mockQuery);
+
+// if (query.isTitleOnly){
+//     console.log("calling full query handler with,", query);
+//     wikiHandler.getDescriptionAndToc(query.title, function (textMessage) {
+//         console.log("textMessage", textMessage);
+//     });
+// } else if (query.isTitleAndArgs) {
+//     console.log("calling get header handler with", query);
+//     wikiHandler.getSections(query.title, query.args, session, function(textMessage) {
+//         console.log("textMessage", textMessage);
+//     });
+// }
+
 
 
 app.post('/incoming', utils.handleHelpRequest, session.getSession, function(req, res) {
@@ -49,19 +44,20 @@ app.post('/incoming', utils.handleHelpRequest, session.getSession, function(req,
     var replyPhoneNumber = req.body.From;
     var queryText = req.body.Body;
     var query = utils.parseQuery(queryText);
-    if (query.isFull){
+
+    if (query.isTitleOnly){
         console.log("calling full query handler with,", query);
-        wikiHandler.getFullData(query.title, query.header, function (queryResp) {
-            twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
-        })
-    } else {
+        wikiHandler.getDescriptionAndToc(query.title, function (textMessage) {
+            twilioHandler.sendSMSReply(textMessage, replyPhoneNumber);
+        });
+    } else if (query.isTitleAndArgs) {
         console.log("calling get header handler with", query);
-        wikiHandler.getHeaders(query.title, function(headerList) {
-            twilioHandler.sendHeaders(headerList, replyPhoneNumber)
-        })
+        wikiHandler.getSections(query.title, query.args, session, function(textMessage) {
+            twilioHandler.sendSMSReply(textMessage, replyPhoneNumber);
+        });
     }
     //wikiHandler.getWikiData(queryText, function (queryResp) {
-    //    twilioHandler.sendSearchResults(queryResp, replyPhoneNumber);
+    //    twilioHandler.sendSMSReply(queryResp, replyPhoneNumber);
     //});
 
 });

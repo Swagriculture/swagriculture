@@ -1,4 +1,5 @@
 var twilioHandler = require('./twilio.js');
+
 function _handleHelpRequest (req, res, next) {
     console.log("handling help request");
     if (req.body.Body.toUpperCase() === '+HELP'){
@@ -7,19 +8,37 @@ function _handleHelpRequest (req, res, next) {
         next();
     }
 }
-function _isFullQuery(string){
-    return string.indexOf('+') > 0;
+
+
+function _isTitleOnly(s){
+    return s.length == 1;
 }
-function _parseQuery (string){
-    //query format: title, header (if there is a header)
+function _isTitleAndArgs(s){
+    return (s.length == 2 && s[0] !== "");
+}
+function _isArgsOnly(s){
+    return s[0] === "";
+}
+function _parseQuery (queryStr){
+    //query format: title, args (if there are args)
     var query = {};
-    var parsedQuery = string.split('+');
-    query.title = parsedQuery[0];
-    if(_isFullQuery(string)) {
-        query.header = parsedQuery[1];
-        query.isFull = true;
+    var parsedQuery = queryStr.split('+');
+    if (_isTitleOnly(parsedQuery)){ 
+        query.isTitleOnly = true;
+        query.title = parsedQuery[0].trim();
+        // query.args = null;
     }
-    return query
+    else if (_isTitleAndArgs(parsedQuery)) {
+        query.isTitleAndArgs = true;
+        query.title = parsedQuery[0].trim();
+        query.args = parsedQuery[1].trim();
+    }
+    else if (_isArgsOnly(parsedQuery)) {
+        query.isArgsOnly = true;
+        query.args = parsedQuery[1].trim(); 
+    }
+
+    return query;
 }
 module.exports = {
     handleHelpRequest: _handleHelpRequest,
